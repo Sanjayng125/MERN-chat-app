@@ -5,6 +5,7 @@ import { useAuth } from "../../context/auth";
 const Signin = () => {
   const [auth, setAuth] = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -12,6 +13,7 @@ const Signin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -22,6 +24,7 @@ const Signin = () => {
       });
       const data = await res.json();
       if (data?.success) {
+        setLoading(false);
         alert(data?.message);
         setAuth({ user: data?.user, token: data?.token });
         localStorage.setItem(
@@ -33,6 +36,7 @@ const Signin = () => {
         );
         navigate("/");
       } else {
+        setLoading(false);
         alert(data?.message || "Something went wrong!");
       }
     } catch (error) {}
@@ -76,8 +80,11 @@ const Signin = () => {
               }}
             />
           </div>
-          <button className="w-max p-2 rounded bg-blue-600 text-white hover:opacity-95">
-            Sign in
+          <button
+            className="w-max p-2 rounded bg-blue-600 text-white hover:opacity-95 disabled:opacity-80"
+            disabled={loading}
+          >
+            {loading ? "Loading" : "Sign in"}
           </button>
         </form>
         <div className="my-2">

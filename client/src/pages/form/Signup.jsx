@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -11,6 +12,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -21,9 +23,11 @@ const Signup = () => {
       });
       const data = await res.json();
       if (data?.success) {
+        setLoading(false);
         alert(data?.message);
         navigate("/sign-in");
       } else {
+        setLoading(false);
         alert(data?.message || "Something went wrong!");
       }
     } catch (error) {}
@@ -79,8 +83,11 @@ const Signup = () => {
               }}
             />
           </div>
-          <button className="w-max p-2 rounded bg-blue-600 text-white hover:opacity-95">
-            Sign up
+          <button
+            className="w-max p-2 rounded bg-blue-600 text-white hover:opacity-95 disabled:opacity-80"
+            disabled={loading}
+          >
+            {loading ? "Loading" : "Sign up"}
           </button>
         </form>
         <div className="my-2">
