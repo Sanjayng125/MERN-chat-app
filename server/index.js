@@ -8,6 +8,7 @@ import messageRoute from "./routes/messageRoute.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { Server } from "socket.io";
 
 const app = express();
 dotenv.config();
@@ -40,6 +41,46 @@ app.get("*", (req, res) => {
 //   res.send("Welcome");
 // });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log("Server listening on PORT: " + port);
+});
+
+// socket io ----------------------------------------------------------------------------------------------------------------
+const io = new Server(8800, {
+  cors: {
+    // origin: "http://localhost:5173",
+    origin: "*",
+  },
+});
+
+let activeUsers = [];
+
+io.on("connection", (socket) => {
+  //add new user
+  socket.on("new-user-add", (newUserId) => {
+    //if user is not added previosly
+    if (!activeUsers.some((user) => user.userId === newUserId)) {
+      activeUsers.push({
+        userId: newUserId,
+        socketId: socket.id,
+      });
+    }
+    io.emit("get-users", activeUsers);
+    // console.log("Connected Users", activeUsers);
+  });
+
+  // send message
+  socket.on("send-message", (data) => {
+    const { receiverId } = data;
+    const user = activeUsers.find((user) => user.userId === receiverId);
+    if (user) {
+      io.to(user.socketId).emit("receive-message", data);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+    io.emit("get-users", activeUsers);
+    // console.log("User Dissconnected", activeUsers);
+  });
 });
