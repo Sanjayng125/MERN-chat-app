@@ -47,6 +47,7 @@ const server = app.listen(port, () => {
 
 // socket io ----------------------------------------------------------------------------------------------------------------
 const io = new Server(8800, {
+  pingTimeout: 60000,
   cors: {
     // origin: "http://localhost:5173",
     origin: "*",
