@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { format } from "timeago.js";
+import Spinner2 from "../Spinner2";
 
 const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const scroll = useRef();
 
   useEffect(() => {
@@ -18,12 +20,15 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
     const userId = chat?.members?.find((id) => id !== currentUserId);
 
     const getUserData = async () => {
+      setLoading(true);
       try {
         const res = await fetch(`/api/user/get-user/${userId}`);
         const data = await res.json();
         setUserData(data);
         // console.log(data);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     };
@@ -32,11 +37,14 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
 
   useEffect(() => {
     const fetchMessages = async () => {
+      setLoading(false);
       try {
         const { data } = await axios.get(`/api/message/${chat._id}`);
         // console.log(data);
         setMessages(data);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     };
@@ -72,13 +80,18 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
 
   return (
     <>
-      <div className="w-full h-screen">
-        {chat === null && (
+      <div className="w-full h-dvh">
+        {!loading && chat === null && (
           <h1 className="text-xl text-center text-white">
             Select a chat to start messaging
           </h1>
         )}
-        {chat !== null && (
+        {loading && (
+          <div className="w-full h-dvh flex justify-center items-center">
+            <Spinner2 width={"150px"} height={"150px"} />
+          </div>
+        )}
+        {!loading && chat !== null && (
           <div className="h-[90%] overflow-auto">
             {/* header */}
             <div className="fixed header flex flex-col w-full bg-slate-600">

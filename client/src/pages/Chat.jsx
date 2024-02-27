@@ -6,6 +6,7 @@ import ChatBox from "../components/ChatBox/ChatBox";
 import { io } from "socket.io-client";
 import { Link } from "react-router-dom";
 import { FaMessage, FaPerson, FaXmark } from "react-icons/fa6";
+import Spinner2 from "../components/Spinner2";
 
 const Chat = () => {
   const [auth] = useAuth();
@@ -49,12 +50,15 @@ const Chat = () => {
   }, [auth?.user]);
 
   const getChats = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`/api/chat/${auth?.user?._id}`);
       const data = await res.json();
       setChats(data);
       // console.log(data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -146,9 +150,9 @@ const Chat = () => {
   };
 
   return (
-    <div className="w-full h-screen flex justify-center relative">
+    <div className="w-full h-dvh flex justify-center relative">
       <div
-        className="addChat w-full h-screen absolute bg-black bg-opacity-50 z-30"
+        className="addChat w-full h-dvh absolute bg-black bg-opacity-50 z-30"
         hidden={!addUserMenuOn}
       >
         <div className="bg-white p-5 rounded-lg flex flex-col gap-3 absolute left-2/4 top-2/4 translate-x-[-50%] translate-y-[-50%]">
@@ -251,18 +255,27 @@ const Chat = () => {
             )}
           </div>
         </div>
-        <div className="chat-list w-full p-2 flex flex-col gap-2">
-          <p className="text-white m-2 text-xl font-semibold">Chats</p>
+        <div className="chat-list w-full p-2 flex flex-col items-center gap-2">
+          <p className="text-white my-2 text-xl font-semibold mr-auto">Chats</p>
           <button
             onClick={() => setAddUserMenuOn(!addUserMenuOn)}
             className="bg-white p-2 rounded-full absolute text-slate-700 text-2xl right-2 bottom-2 hover:text-white hover:bg-slate-700"
           >
             <FaPlus />
           </button>
-          {chats.length > 0 ? (
+          {loading && <Spinner2 />}
+          {!loading && (!chats || chats.length <= 0) && (
+            <h1 className="text-white">No Chats Yet</h1>
+          )}
+          {chats &&
+            chats.length > 0 &&
             chats.map((chat, i) => {
               return (
-                <div onClick={() => setCurrentChat(chat)} key={i}>
+                <div
+                  onClick={() => setCurrentChat(chat)}
+                  key={i}
+                  className="w-full"
+                >
                   <Conversation
                     data={chat}
                     currentUserId={auth?.user?._id}
@@ -270,10 +283,7 @@ const Chat = () => {
                   />
                 </div>
               );
-            })
-          ) : (
-            <h1 className="text-white">No Chats Yet</h1>
-          )}
+            })}
         </div>
       </div>
 
@@ -283,7 +293,7 @@ const Chat = () => {
         }`}
       >
         <button
-          className={`h-fit absolute z-10 p-3 pl-0 m-2 text-white text-2xl rounded-full cursor-pointer`}
+          className={`h-fit fixed z-10 p-3 pl-0 m-2 text-white text-2xl rounded-full cursor-pointer`}
           onClick={() => setCurrentChat(null)}
           hidden={currentChat === null}
         >

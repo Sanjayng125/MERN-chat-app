@@ -37,11 +37,13 @@ app.get("*", (req, res) => {
 
 // ------------------------------Deployment----------------------------------
 
+// ------------------------------Dev----------------------------------
 // app.get("/", (req, res) => {
 //   res.send("Welcome");
 // });
+// ------------------------------Dev----------------------------------
 
-const server = app.listen(port, () => {
+app.listen(port, () => {
   console.log("Server listening on PORT: " + port);
 });
 
