@@ -272,7 +272,12 @@ const Chat = () => {
             chats.map((chat, i) => {
               return (
                 <div
-                  onClick={() => setCurrentChat(chat)}
+                  onClick={() => {
+                    setLoading(true);
+                    setCurrentChat(null);
+                    setCurrentChat(chat);
+                    setLoading(false);
+                  }}
                   key={i}
                   className="w-full"
                 >
