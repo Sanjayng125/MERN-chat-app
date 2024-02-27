@@ -22,6 +22,7 @@ const Chat = () => {
   const [searchUser, setSearchUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchAllUser, setSearchAllUser] = useState([]);
+  const [searchAllUserError, setSearchAllUserError] = useState(false);
 
   //   sending message to socket server
   useEffect(() => {
@@ -130,16 +131,15 @@ const Chat = () => {
 
   const searchUsers = async (query) => {
     if (query !== "") {
-      setLoading(true);
+      setSearchAllUserError(false);
       try {
         const res = await fetch(`/api/user/search-users/${query}`);
         const data = await res.json();
         if (data?.success) {
           setSearchAllUser(data?.users);
-          setLoading(false);
         } else {
-          setLoading(false);
-          alert(data?.msg);
+          setSearchAllUserError(data?.msg);
+          setSearchAllUser([]);
         }
       } catch (error) {
         console.log(error);
@@ -239,18 +239,27 @@ const Chat = () => {
                 className="p-2 py-1 rounded-3xl outline-none flex-1 text-black"
                 placeholder="Search name, email"
                 onChange={(e) => {
-                  searchUsers(e.target.value);
+                  searchUsers(e.target.value || "");
                 }}
               />
             </div>
-            {searchAllUser?.length > 0 && (
-              <div className="w-full bg-white p-2 text-black mt-2 rounded-xl absolute z-10 top-10">
-                {searchAllUser?.map((user, i) => (
-                  <p key={i}>
-                    <span className="font-semibold">{user?.fullName}</span> -{" "}
-                    {user?.email}
-                  </p>
-                ))}
+            {(searchAllUserError || searchAllUser?.length > 0) && (
+              <div className="w-full bg-white p-2 text-black mt-2 rounded-xl absolute z-10 top-10 flex justify-between">
+                <div>
+                  {searchAllUserError && <p>{searchAllUserError}</p>}
+                  {searchAllUser?.map((user, i) => (
+                    <p key={i}>
+                      <span className="font-semibold">{user?.fullName}</span> -{" "}
+                      {user?.email}
+                    </p>
+                  ))}
+                </div>
+                <button
+                  className="ml-1 h-min w-min flex items-center"
+                  onClick={() => setSearchAllUser([])}
+                >
+                  <FaXmark />
+                </button>
               </div>
             )}
           </div>
