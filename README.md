@@ -12,13 +12,13 @@
 ![Screenshot (26)](https://github.com/Sanjayng125/MERN-chat-app/assets/106653066/e3a70a04-4561-41d8-9974-ad2886accdff)
 
 # .ENV
-PORT =
-MONGO_URL =
-JWT_SECRET =
-Client side
-VITE_FIREBASE_API =
+PORT = <br>
+MONGO_URL = <br>
+JWT_SECRET = <br>
+Client side <br>
+VITE_FIREBASE_API = 
 
 # Build & start
-npm run build
+npm run build <br>
 npm run dev
 
