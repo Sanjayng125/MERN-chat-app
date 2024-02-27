@@ -8,6 +8,7 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const scroll = useRef();
 
   useEffect(() => {
@@ -53,6 +54,7 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
 
   const handleSend = async (e) => {
     e.preventDefault();
+    setSending(true);
     const message = {
       senderId: currentUserId,
       text: newMessage,
@@ -64,7 +66,9 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
       const { data } = await axios.post(`/api/message/`, message);
       setMessages([...messages, data]);
       setNewMessage("");
+      setSending(false);
     } catch (error) {
+      setSending(false);
       console.log(error);
     }
 
@@ -145,10 +149,11 @@ const ChatBox = ({ chat, currentUserId, setSendMessage, receiveMessage }) => {
                 onChange={(e) => setNewMessage(e.target.value)}
               />
               <button
+                disabled={sending}
                 onClick={handleSend}
-                className="p-3 py-2 rounded-3xl text-white bg-slate-700"
+                className="p-3 py-2 rounded-3xl text-white bg-slate-700 disabled:opacity-80"
               >
-                Send
+                {sending ? "Sending" : "Send"}
               </button>
             </div>
           </div>
