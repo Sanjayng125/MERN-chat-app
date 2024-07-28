@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { FaMessage, FaPerson, FaXmark } from "react-icons/fa6";
 import Spinner2 from "../components/Spinner2";
 
+const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:8800";
+
 const Chat = () => {
   const [auth] = useAuth();
   const [chats, setChats] = useState([]);
@@ -32,7 +34,7 @@ const Chat = () => {
   }, [sendMessage]);
 
   useEffect(() => {
-    socket.current = io("http://localhost:8800");
+    socket.current = io(SOCKET_URL);
     socket.current.emit("new-user-add", auth?.user?._id);
     socket.current.on("get-users", (users) => {
       setOnlineUsers(users);
